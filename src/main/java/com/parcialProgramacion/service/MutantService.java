@@ -2,6 +2,8 @@ package com.parcialProgramacion.service;
 
 import com.parcialProgramacion.controller.Dto.MutantRequest;
 import com.parcialProgramacion.controller.Dto.MutantResponse;
+import com.parcialProgramacion.controller.exceptionHandler.exception.InvalidDnaSequenceException;
+import com.parcialProgramacion.controller.exceptionHandler.exception.NoDnaFoundException;
 import com.parcialProgramacion.model.MutantEntity;
 import com.parcialProgramacion.service.repository.MutantRepository;
 import lombok.AllArgsConstructor;
@@ -9,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -21,14 +22,12 @@ public class MutantService {
     private static final char[] BASES = {'A', 'T', 'C', 'G'};
     public Boolean isMutant(MutantRequest request) {
 
-
         // Check if the sequence is valid
         for ( String  sequenceDna : request.getDnaSequence()){
             if(sequenceDna .length() != 6){
-                throw new IllegalArgumentException("The sequence must be exactly 6 characters long");
+                throw new InvalidDnaSequenceException("The sequence must be exactly 6 characters long");
             }
         }
-
 
         Boolean response = searchSequence(request);
         MutantEntity mutant = new MutantEntity();
@@ -53,7 +52,7 @@ public class MutantService {
 
         List<MutantEntity> mutant = mutantRepository.findAll();
         if(mutant.isEmpty()){
-            throw new RuntimeException("No se encontro ningun dna");
+            throw new NoDnaFoundException("No se encontró ningún DNA");
         }
 
         int humanCounter = 0;
@@ -75,36 +74,39 @@ public class MutantService {
                         .build();
         log.info("DNA response: {}",response);
         return response;
-
-
     }
     protected static Boolean searchSequence(MutantRequest request){
-        long inicio = System.currentTimeMillis();
         // Convert all sequences to uppercase
-        List<String> dna = request.getDnaSequence().stream().map(sequence -> sequence.toUpperCase()).toList();
+        List<String> dna = request.getDnaSequence().stream().map(String::toUpperCase).toList();
         int n = dna.size();
-
         // Check rows
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j <= n - MIN_SEQUENCE_LENGTH; j++) {
-                if (checkSequence(dna.get(i).substring(j, j + MIN_SEQUENCE_LENGTH))) {
-                    return true;
+            int consecutiveCount = 1;
+            for (int j = 1; j < n; j++) {
+                if (dna.get(i).charAt(j) == dna.get(i).charAt(j - 1)) {
+                    consecutiveCount++;
+                    if (consecutiveCount == MIN_SEQUENCE_LENGTH) {
+                        return true;
+                    }
+                } else {
+                    consecutiveCount = 1;
                 }
             }
         }
         // Check columns
-        for (int i = 0; i <= n - MIN_SEQUENCE_LENGTH; i++) {
-            for (int j = 0; j < n; j++) {
-                StringBuilder sb = new StringBuilder();
-                for (int k = 0; k < MIN_SEQUENCE_LENGTH; k++) {
-                    sb.append(dna.get(i+k).charAt(j));
-                }
-                if (checkSequence(sb.toString())) {
-                    return true;
+        for (int j = 0; j < n; j++) {
+            int consecutiveCount = 1;
+            for (int i = 1; i < n; i++) {
+                if (dna.get(i).charAt(j) == dna.get(i - 1).charAt(j)) {
+                    consecutiveCount++;
+                    if (consecutiveCount == MIN_SEQUENCE_LENGTH) {
+                        return true;
+                    }
+                } else {
+                    consecutiveCount = 1;
                 }
             }
         }
-
         // Check diagonals
         for (int i = 0; i <= n - MIN_SEQUENCE_LENGTH; i++) {
             for (int j = 0; j <= n - MIN_SEQUENCE_LENGTH; j++) {
@@ -119,13 +121,7 @@ public class MutantService {
                 }
             }
         }
-        long fin = System.currentTimeMillis();
-
-        double tiempo = (double) ((fin - inicio)/1000);
-
-        System.out.println(tiempo +" segundos");
         return false;
-
     }
     private static boolean checkSequence(String sequence) {
         for (char base : BASES) {

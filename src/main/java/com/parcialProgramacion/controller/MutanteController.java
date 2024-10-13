@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 public class MutanteController{
 
     private MutantService mutantService;
-    @PostMapping
-    public ResponseEntity<String>askForMutant(@RequestBody MutantRequest request){
+    @PostMapping("/verify")
+    public ResponseEntity<String>verifyMutant(@RequestBody MutantRequest request){
         if (!mutantService.isMutant(request)){
             return new ResponseEntity<>("Humano", HttpStatus.FORBIDDEN);
         }
@@ -26,14 +26,3 @@ public class MutanteController{
         return ResponseEntity.ok(mutantService.stats());
     }
 }
-/*Human DNA*/
-/*
-"dnaSequence": [
-        "ATCGGA",
-        "CGGTGC",
-        "TTATAT",
-        "AGATGG",
-        "CCTCTA",
-        "TCACTG"
-        ]
- */
