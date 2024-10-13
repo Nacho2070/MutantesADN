@@ -78,7 +78,6 @@ public class MutantService {
 
 
     }
-
     protected static Boolean searchSequence(MutantRequest request){
         long inicio = System.currentTimeMillis();
         // Convert all sequences to uppercase
@@ -125,7 +124,7 @@ public class MutantService {
         double tiempo = (double) ((fin - inicio)/1000);
 
         System.out.println(tiempo +" segundos");
-    return false;
+        return false;
 
     }
     private static boolean checkSequence(String sequence) {
@@ -136,4 +135,6 @@ public class MutantService {
         }
         return false;
     }
+
 }
+

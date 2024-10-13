@@ -36,6 +36,15 @@ dependencies {
 	//Hibernate and JPA Dependencies
 	implementation "org.hibernate.orm:hibernate-core:6.6.0.Final"
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// JUnit 5 para realizar las pruebas
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+	// Mockito core para la funcionalidad principal de mockito
+	testImplementation 'org.mockito:mockito-core:5.6.0'
+
+	// Mockito JUnit 5 para la integración con JUnit 5
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.6.0'
 }
 
 tasks.named('test') {

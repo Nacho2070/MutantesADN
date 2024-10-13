@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Builder
 public class MutantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

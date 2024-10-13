@@ -21,7 +21,7 @@ public class MutanteController{
         }
         return new ResponseEntity<>("Mutante", HttpStatus.ACCEPTED);
     }
-    @GetMapping
+    @GetMapping("/stats")
     public ResponseEntity<MutantResponse>mutantStats(){
         return ResponseEntity.ok(mutantService.stats());
     }
